@@ -1,7 +1,3 @@
-# trailer-parking
-Control design to model parking a trailer
-
-
 # Trailer Parking Controller
 MATLAB project to display and control a trailer going backwards.
 
