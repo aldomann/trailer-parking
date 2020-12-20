@@ -1,0 +1,442 @@
+%-----------------------------------------------------------------
+%	CONTROL THEORY
+%	!TEX root = ./../main.tex
+%-----------------------------------------------------------------
+\section{Mathematical Systems and Control Theory}\label{sec:intro-msct}
+
+The following section deals with the topic of mathematical control theory. A short introduction is given, followed by a discussion of selected terms and definitions needed for this work. Among other things the term \emph{controllability} and the \emph{pole placement theorem} will be presented. We will only see the relevant proofs. All omitted proofs can be found in \cite{Sontag1998, Hinrichsen2005, Hautus2001}.\footnote{If you are familiar with this topic you can skip this section and continue with \cref{sec:controllerdesign}}\\
+
+Classical techniques for analysis and design of control systems have been used for more than five decades in a vast variety of industrial applications. These methods are based on transfer function models of the plant to be controlled. However, when it comes to more evolved tasks with e.g. more input and output variables other techniques are used. These techniques are based on state space models of the plant. One major advantage of state space models is for example that single-input single-output systems are equally treated as multi-input multi-output systems.
+
+\tikzstyle{block} = [draw, fill=white, rectangle,
+minimum height=3em, minimum width=6em]
+\tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+\begin{figure}[H]
+	\centering
+	% The block diagram code is probably more verbose than necessary
+	\begin{tikzpicture}[auto, node distance=4cm,>=latex']
+	% We start by placing the blocks
+	\node [input, name=input] {};
+	%\node [sum, right of=input] (sum) {};
+	%\node [block, right of=input] (controller) {Controller};
+	\node [block, right of=input,node distance=4cm] (system) {Dynamical System};
+	% We draw an edge between the controller and system block to
+	% calculate the coordinate u. We need it to place the measurement block.
+	\draw [->] (input) -- node[name=u] {$u$} (system);
+	\node [output, right of=system] (output) {};
+	%\node [block, below of=u] (measurements) {Measurements};
+
+	% Once the nodes are placed, connecting them is easy.
+	%\draw [draw,->] (input) -- node {$r$} (sum);
+	%\draw [->] (sum) -- node {$e$} (controller);
+	\draw [->] (system) -- node [name=y] {$y$}(output);
+	%\draw [->] (y) |- (measurements);
+	%\draw [->] (measurements) -| node[pos=0.99] {$-$}
+	%node [near end] {$y_m$} (sum);
+	\end{tikzpicture}
+	\caption{Block diagram of a dynamical system}
+	\label{fig:blockdiagram_dyn_sys}
+\end{figure}
+
+For this work we consider a dynamical system which can be represented by a block diagram as seen in figure \ref{fig:blockdiagram_dyn_sys}. There is an input $u(t)$ which represents controls, noises and disturbances and an output $y(t)$ representing the measurements. We assume that the behaviour of this “black box” can be approximated by the mathematical model
+\begin{align}\label{eq:dynsys}
+	\begin{split}
+		\dot{x}(t) &= f(t, x(t), u(t))\\
+		\dot{y}(t) &= h(x(t), u(t))
+	\end{split}
+\end{align}
+were $x$ is the vector of internal variables. When modelling a physical system, $x$ is not necessary related to the “real” physical variables.
+
+We consider that system (\ref{eq:dynsys}) is a linear system of the form
+\begin{align*}
+	\dot{x}(t) &= Ax(t) + Bu(t)\\
+	\dot{y}(t) &= Cx(t) + Du(t)
+\end{align*}
+which is called \emph{linear time-invariant control system} (LTI). The matrices are called \emph{system matrix} $A$, \emph{input matrix} $B$, \emph{output matrix} $C$ and \emph{feed-through matrix} $D$. The class of LTI systems is a very simple class. Nevertheless, lots of processes can be described using this class by a “sufficiently good” linearisation. Nowadays linear models are still used to model “real world” applications. It can be used to approximate the system in a neighbourhood of certain points. This model is obtained by linearisation which is feasible at points $(x^*,u^*)$ such that $f(x^*,u^*) = 0$. These points are equilibrium points.
+
+%-----------------------------------------------------------------
+\subsection{Controllability}
+
+This section will introduce one important property of linear systems that determine whether or not given control objectives can be achieved. Simply said, a system is said to be controllable if it is possible to find a control input that takes the system from any initial state to any final state in any given time interval. We will see necessary and sufficient conditions for controllability.
+
+\bigskip
+Consider a system in state space realisation
+\begin{align}
+	\dot{x}(t) &= Ax(t) + Bu(t),\qquad x(t_0) = x^0 \label{eq:IVP}
+\end{align}
+where $A\in\mathbb{R}^{n\times n}$, $B\in\mathbb{R}^{n\times m}$, $(t_0,x^0)\in\mathbb{R}\times\mathbb{R}^n$, and $u(\cdot) \in U := \mathcal{L}_{loc}^1$. System (\ref{eq:IVP}) will shortly be represented as $(A,B)$. The space of input functions is defined as
+\begin{align*}
+	\mathcal{L}_{loc}^1 := \{&f:\mathbb{R}\rightarrow\mathbb{R}^m \mid f_i \quad\text{measureable}\\
+	&\text{and} \int_K \mid f_i(t)\mid dt < \infty , \quad \forall K \subseteq \mathbb{R} \quad \text{compact}, \quad i=1,...,m  \}.
+\end{align*}
+Alternatively, the space of input functions $U$ can be defined as $U := \mathcal{PC}(\mathbb{R}\rightarrow\mathbb{R}^m)$ which are all piece-wise continuous functions. An important property of the input space is that $U$ is closed under certain cencatenation, i.e. for any $u_1,u_2\in U$ and $b \in \mathbb{R}$ the concatenation
+\begin{align*}
+	u_1 \quad\&_b\quad u_2 := \left(t \mapsto
+	\begin{cases}
+		u_1(t), \quad t \le b\cr
+		u_2(t), \quad t > b
+	\end{cases} \right)
+\end{align*}
+is in $U$.
+
+\noindent The unique global solution of the initial value problem (\ref{eq:IVP}) is
+\begin{align*}
+	t \mapsto x(t;t_0,x^0,u) = e^{A^{(t-t_0)}}x^0 + \int_{t_0}^t e^{A^{(t-s)}}Bu(s)ds.
+\end{align*}
+The set of pairs $(x,u)$ which solve (\ref{eq:IVP}) for some $(t_0,x^0)$ is called the \emph{behaviour} of (\ref{eq:IVP}):
+\begin{align*}
+	\mathcal{B}_{(A,B)} := \{(x,u) \in X\times U\mid \exists (t_0,x^0) \in \mathbb{R}\times\mathbb{R}^n,\quad x(\cdot) = x(\cdot;t_0,x^0,u )    \}
+\end{align*}
+Here, $X$ is a suitable space of functions such that
+\begin{align*}
+	\{x(\cdot;t_0,x^0,u ) \mid (t_0,x^0) \in \mathbb{R}\times\mathbb{R}^n, \quad u \in U  \} \subseteq X.
+\end{align*}
+First, we will define the terms  \emph{reachable}, \emph{controllable} and \emph{null-controllable}.
+\begin{mydef}
+	A system $(A,B)$ is called
+	\begin{itemize}
+		\item \emph{Reachable} at time $T > 0$ if for all $x^1 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = 0$ and $x(T) = x^1$,
+		\item \emph{Controllable} at time T if for all $x^0,x^1 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = x^0$ and $x(T) = x^1$,
+		\item \emph{Null-controllable} at time T if for all $x^0 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = x^0$ and $x(T) = 0$.
+	\end{itemize}
+\end{mydef}
+\noindent Simply said: \emph{Reachable} means that we can steer the system from 0 to any final state in any time $Z$. \emph{Controllable} mean that it is possible to steer the system from any initial state to any final state in any given time $T$ and hence \emph{null-controllable} means that the final state is 0. One easily checks that $x^0 \in\mathbb{R}^n$ is null-controllable at $T$ if and only if there exists a $u\in U$ such that $e^{AT}x^0 + \int_{0}^T e^{A^(T-s)}Bu(s)ds = 0$. This is equivalent to: $-e^{AT}x^0$ is reachable at time $T$.
+Next, we define the \emph{reachable set} and the \emph{controllable set}.
+\begin{mydef}
+	The \emph{reachable set} from $x^0 \in \mathbb{R}^n$ at time $T>0$ is defined as
+	\begin{align*}
+		\mathcal{R}_{x^0}(T) := \{x^1 \in \mathbb{R}^n \mid \exists (x,u) \in \mathcal{B}_{(A,B)}: x(0) = x^0, x(T) = x^1   \}.
+	\end{align*}\\The \emph{controllable set} to $x^1\in\mathbb{R}^n$ at time $T$ is defined as
+	\begin{align*}
+		\mathcal{C}_{x^1}(T) := \{x^0 \in \mathbb{R}^n \mid \exists (x,u) \in \mathcal{B}_{(A,B)}: x(0) = x^0, x(T) = x^1   \}.
+	\end{align*}
+\end{mydef}
+Having this definition we can make the following proposition.
+\begin{myprop}\label{prop:2.4}
+	For $(A,B)$ we have $\mathcal{R}_0(T) = e^{AT}\mathcal{C}_0(T)$ and, in particular, $(A,B)$ is reachable at time $T$ if and only if $(A,B)$ is null controllable at time $T$.
+\end{myprop}
+\noindent From Proposition \ref{prop:2.4} we can deduce the following.
+\begin{myprop}
+	The system $(A,B)$ is reachable at $T>0$ if and only if $(A,B)$ is null-controllable at $T>0$ if and only if $(A,B)$ is controllable at $T>0$.
+\end{myprop}
+\begin{proof}
+	By Proposition \ref{prop:2.4} it only remains to prove that if $(A,B)$ is reachable at $T$ then $(A,B)$ is controllable at $T$.\\Let $x^0,x^1 \in\mathbb{R}^n$ be reachable at time $T$. Then there exists $(x_1,u_1) \in \mathcal{B}_{(A,B)}$ such that $x_1(0)=0$ and $x_1(T)=x^0$ and there exists $(x_2,u_2)\in\mathcal{B}_{(A,B)}$ such that $x_2(0) = 0$ and $x_2(T) = x^1-x_1(2T)$. Since $(x_1(\cdot + T), u_1(\cdot+T)  )\in\mathcal{B}_{(A,B)}$, which is known as \emph{shift-invariance} of the behaviour, we find
+	\begin{align*}
+		(x(\cdot),u(\cdot)) := (x_1(\cdot+T)+x_2(\cdot), u_1(\cdot+T) +u_2(\cdot)  ) \in \mathcal{B}_{(A,B)}
+	\end{align*}
+	with
+	\begin{align*}
+		x(0) &= x_1(T) + x_2(0) = x^0\\
+		x(T) &= x_1(2T) + x^1-x_1(2T) = x^1.
+	\end{align*}
+\end{proof}
+In general it is hard to check if for any $x^0,x^1\in\mathbb{R}^n$ there exists an input $u$ that steers $x^0$ to $x^1$. To check this easily the following helps.
+\begin{mythm}\label{thm:2.7}
+	For all $T>0$ it holds
+	\begin{align*}
+		\mathcal{R}_0(T) = \im[B,AB,...,A^{n-1}B]   =: \im K(A,B) \in \mathbb{R}^{n \times nm}.
+	\end{align*}
+\end{mythm}
+The matrix $K$ is known as the \emph{Kalman}-matrix. To proof this theorem we need the following lemma.
+\begin{mylem}\label{lem:2.8}
+	For any $\eta\in\mathbb{R}^n$ and system $(A,B)$ the following conditions are equivalent:
+	\begin{enumerate}
+		\item \label{1} $\eta$ is orthogonal to the reachable set $\mathcal{R}_0(T)$
+		\item \label{2} For all $t\in [0,T]$ it holds $\eta^Te^{At}B=0$
+		\item \label{3} For all $k \in \mathbb{N}_0$ it holds $\eta^TA^kB=0$
+		\item \label{4} $\eta^T[B,AB,...,A^{n-1}B] = 0$.
+		\end{enumerate}
+\end{mylem}
+\begin{proof}
+	First we show that \ref{1} implies \ref{2}.\\Let $x^1 \in \mathcal{R}_0(T)$ Then $x^1=\int_0^Te^{A(T-s)}Bu(s)ds$ for some input $u\in U$. Since $\eta^Tx^1 = 0$ it follows that for all inputs $u\in U$ we have
+	\begin{align*}
+		\eta^T \int_0^Te^{A(T-s)}Bu(s)ds = 0.
+	\end{align*}
+	For $u(\cdot) = B^Te^{A^T(T-s)}\eta \in U$ we find
+	\begin{align*}
+		\int_0^T \eta^Te^{A(T-s)}BB^Te^{A^T(T-s)}\eta ds = 0
+	\end{align*}
+	which is equivalent to
+	\begin{align*}
+		\int_0^T \mid\mid   B^Te^{A^T(T-s)}\eta\mid\mid^2 ds \ge 0.
+	\end{align*}
+	Therefore, for all $s \in [o,T]$ we have $B^Te^{A^T(T-s)}\eta = 0$.\\Now we will show that \ref{2} implies \ref{1}.\\Let $x^1\in\mathcal{R}_0(T)$. Then there exists $u\in U$ so that
+	\begin{align*}
+		\eta^Tx^1 = \eta^T\int_0^Te^{A(t-s)}Bu(s)ds = 0
+	\end{align*}
+	which implies that $\eta$ is orthogonal to $\mathcal{R}_0(T)$.\\Next we will show that \ref{2} implies \ref{3}.\\For $t=0$ we have $\eta^TB=0$. Therefore, for all $t\in [0,T]$ we have
+	\begin{align*}
+		0 &= (\frac{d}{dt})^k\eta^Te^{At}B\\
+		&= \eta^TA^ke^{At}B \quad \overset{t=0}{\longrightarrow} \quad\eta^TA^kB=0
+	\end{align*}
+	which shows \ref{3}.\\Looking at $e^{At}=\sum_{k=0}^{\infty}\frac{t^kA^k}{k!}$ we see that \ref{3} also implies \ref{2}.\\That \ref{3} implies \ref{4} is obvious and the opposite direction can be shown by using the \emph{Cayley-Hamilton} theorem.
+\end{proof}
+Now we can easily proof Theorem \ref{thm:2.7}.
+\begin{proof}
+	By Lemma \ref{lem:2.8} we have $\eta \in \mathcal{R}_0(T)^\perp$ which is equivalent to $\eta$ is perpendicular to the image of $(K(A,B))$. This implies $\mathcal{R}_0(T) = \im(K(A,B))$.
+\end{proof}
+Now we can state how to check controllability easily.
+\begin{mycor}\label{cor:ctrb}
+	For a system $(A,B)$ the following statements are equivalent:
+	\begin{enumerate}
+		\item There exists $T>0$ such that $(A,B)$ is controllable at time $T$.
+		\item $\im(K(A,B)) = \mathbb{R}^n$
+		\item $\Rank(K(A,B)) = n$
+		\item For all $T>0$ the system $(A,B)$ is controllable at time $T$. We say that $(A,B)$ is controllable.
+	\end{enumerate}
+\end{mycor}
+\begin{myrem}\label{rem:2.11}
+    Controllability is invariant under change of coordinates. Define $z(t) := T^{-1} x(t)$ for an invertible matrix $T \in \mathbb{R}^{n\times n}$. Then
+\begin{align*}
+	T^{-1}TT^{-1}\dot{x}(t) &= T^{-1}ATT^{-1}x(t)+T^{-1}Bu(t)\\
+	\dot{z}(t) &= \tilde{A}z(t) + \tilde{B}u(t)
+\end{align*}
+Now we compute the Kalman-matrix.
+\begin{align*}
+	K(\tilde{A},\tilde{B}) &= K(T^{-1}AT, T^{-1}B)\\
+	&= [T^{-1}B, T^{-1}ATT^{-1}B,...,(T^{-1}AT)^{n-1}T^{-1}B] \\
+	&= T^{-1} [B,AB,...,A^{n-1}B] \\
+	&= T^{-1}K(A,B)
+\end{align*}
+This shows that the image of $K(A,B)$ equals the image of $K(\tilde{A},\tilde{B})$.
+\end{myrem}
+
+Now we have a powerful tool to check whether or not a system is controllable. Indeed we will use Corollary \ref{cor:ctrb} to show the controllability of our problem. Next, we will give a tool to control a system.
+
+%-----------------------------------------------------------------
+\subsection{Pole Placement Theorem}\label{sec:ppthm}
+
+As we may know from the theory of differential equations stability of a system can be analysed by considering the eigenvalues of the matrix $A$. We might ask us what eigenvalues and controllability have in common. In this section we will see how we can make a system $(A,B)$ become stable if it is controllable. Therefore we introduce the \emph{pole placement theorem}. An important question is whether for any given choice of eigenvalues there exists a feedback gain $F$ that achieves the desired closed-loop eigenvalues, also know as poles. We will see that this is indeed the case if the system is controllable.
+
+%\subsubsection{SISO-Systems}
+%In the following section we will shortly consider single-input-single-output system, short \emph{SISO-systems}. Consider a system $(A,b,c)$ in time-domain with
+%\begin{align*}
+%	\dot{x}(t) &= Ax(t) + bu(t)\\
+%	\dot{y}(t) &= cx(t)
+%\end{align*}
+%where $(A,b,c)\in \mathbb{R}^{n\times n}\times \mathbb{R}^n \times \mathbb{R}^{1\times n}  $. Using Laplace transformation we obtain
+%\begin{align*}
+%	\mathcal{L}\{x\}(s) &= (sI-A)^{-1}b\mathcal{L}\{u\}(s) \\
+%	 \mathcal{L}\{y\}(s) &= c(sI-A)^{-1}b\mathcal{L}\{u\}(s)\\
+%	 &= \frac{c\text{adj}(sI-A)b}{\Det(sI-A)}\mathcal{L}\{u\}(s)\\
+%	 &=: \frac{p(s)}{q(s)}\mathcal{L}\{u\}(s).
+%\end{align*}
+%The term $\frac{p(s)}{q(s)}$ is in $\mathbb{R}(s) = \{\frac{p(s)}{q(s)} \mid p(s), q(s) \in \mathbb{R}[s], q(s) \ne 0    \}$. $\mathbb{R}(s)$ denotes the quotient field of $\mathbb{R}[s]$.
+%
+%%TODO: ADD MORE
+
+%\subsubsection{Stabilisation and Feedback}
+	% The block diagram code is probably more verbose than necessary
+\tikzstyle{block} = [draw, fill=white, rectangle,
+minimum height=2em, minimum width=7em]
+\tikzstyle{sum} = [draw, white, circle]
+
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[auto,node distance=2cm,>=latex']
+	% We start by placing the blocks
+	\node [input, name=input] {};
+	\node [sum, right of=input] (sum) {};
+	\node [block, right of=sum,align=center] (B) {$\dot{x}(t) = Ax(t) + Bu(t)$\\$\dot{y}(t) = Cx(t) + Du(t)$};
+	\node [block, below of=B, align=center]  (K) {$\dot{\omega}(t) = K\omega(t) + Ly(t)$\\$\dot{u}(t) = M\omega(t) + Ny(t)$};
+	\node [sum, right of=B] (sum2) {};
+	\node [output, right of=sum2] (output) {};
+
+	\draw [->] (input) -- node[name=sum] {u} (B);
+	\draw [->] (B) -- node[pos=0.7, name=y] {y} (output);
+	\draw [->] (y) |- node {}(K);
+	\draw [->] (K) -| node {}(sum);
+	\end{tikzpicture}
+	\caption{Block diagram of a feedback loop}
+	\label{fig:blockdiagram_feedback_loop}
+\end{figure}
+In the following section we will discuss how to achieve stabilisation through state feedback if possible. A very powerful theorem will be the \emph{pole placement theorem}.
+
+We want to determine a feedback controller as represented in figure \ref{fig:blockdiagram_feedback_loop} such that the closed-loop system
+\begin{align*}
+	\begin{pmatrix}
+	\dot{x}(t) \\
+	\dot{\omega}(t)
+	\end{pmatrix} =
+	\begin{pmatrix}
+	A+BNC & BM \\
+	LC & K
+	\end{pmatrix}
+	\begin{pmatrix}
+	x(t) \\
+	\omega(t)
+	\end{pmatrix}
+\end{align*}
+is internally stable. A system $(A,B)$ is said to be \emph{internally stable} if $\sigma(A) \subseteq \mathbb{C}_-$, i.e. if all eigenvalues of $A$ have negative real part. Such a feedback controller is called \emph{stabilising controller}. 
+\begin{mylem}\label{lem:9.1}
+	Let $\lambda\in\mathbb{C}$ be an uncontrollable eigenvalue of $(A,B)$, i.e. $\Rank[A-\lambda I, B] < n$. Then for all matrices $F \in \mathbb{R}^{m\times n}$ we have $\lambda\in\sigma(A+BF) $, where $\sigma(\cdot)$ denotes the spectrum of a matrix.
+\end{mylem}
+\begin{mythm}[Pole Placement]\label{thm:PP}
+	Let $(A,B)$ be a system as in (\ref{eq:IVP}). The the system is controllable if and only if for all monic, i.e. the leading coefficient is 1, polynomial $p(s) \in\mathbb{R}[s]$ with $\Deg(p(s)) = n$ there exists $F\in\mathbb{R}^{m\times n}$ such that $p(s) = \Det((A+BF)-sI)$.
+\end{mythm}
+\noindent To proof the pole placement theorem we need the following theorem and lemma.
+\begin{mythm}\label{thm:4.2}
+    The following two maps $\Gamma:\Sigma_{n,1}^C\rightarrow\Sigma_{n,1}^C$ are canonical forms:
+    \begin{itemize}
+        \item[i)] $\Gamma(A,b) = \left(\begin{pmatrix}
+                    0 &  &  & a_1 \\ 
+                    1 & \ddots &  & \vdots \\ 
+                    & \ddots & 0 & a_{n-1} \\ 
+                    &  & 1 & a_n
+                    \end{pmatrix},
+                    \begin{pmatrix}
+                        1 \\ 
+                        0 \\ 
+                        \vdots \\ 
+                        0
+                    \end{pmatrix} \right)$
+    \item[ii)] $\Gamma(A,b) = \left(\begin{pmatrix}
+		0 & 1 &  &  \\
+		& \ddots & \ddots &  \\
+		&  & 0 & 1 \\
+		a_1 & \dots & a_{n-1} & a_n
+		\end{pmatrix},
+		\begin{pmatrix}
+            0 \\ 
+            \vdots \\ 
+            0 \\ 
+            1
+            \end{pmatrix} \right)$
+    \end{itemize}
+    where in both cases the constants $a_1,...,a_n$ are determined by the characteristic polynomial
+    \begin{align*}
+        \text{det}(sI-A)=s^n-[a_ns^{n-1}+...+a_2s+a_1] \in \mathbb{R}[s].
+    \end{align*}
+\end{mythm}
+\begin{mylem}\label{lem:9.3}
+	Let the system $(A,B)$ be controllable. Then there exist $u_0,...,u_{n-1} \in \mathbb{R}^m$ such that $x_1,...,x_n$ defined by $x_0:=0$, $x_{k+1}=Ax_k+Bu_k$ for $k=0,...,n-1$ are linearly independent.
+\end{mylem}
+% TODO: MAY PROVE THIS
+\begin{proof}[Proof Theorem \ref{thm:PP}]
+	First we will show the if-part by seeking a contradiction. Assume that $(A,B)$ is not controllable. Then there exists an uncontrollable eigenvalue $\lambda$. By Lemma \ref{lem:9.1} we have that $\lambda\in\sigma(A+BF) $ for all matrices $F \in \mathbb{R}^{m\times n}$. If $p(s) \in\mathbb{R}[s]$ is such that $p(\lambda)\ne 0$, then $p(s) \ne \Det((A+BF)-sI)$ for all $F \in \mathbb{R}^{m\times n}$, which is a contradiction.
+
+	Now we will show the only-if-part. Let $m=1$. By Theorem \ref{thm:4.2} and Remark \ref{rem:2.11} we may assume that $(A,B)$ is in controller canonical form, i.e.
+	\begin{align*}
+		A =
+		\begin{pmatrix}
+		0 & 1 &  &  \\
+		& \ddots & \ddots &  \\
+		&  & 0 & 1 \\
+		-a_n & \dots & -a_2 & -a_1
+		\end{pmatrix} \qquad
+		B =
+		\begin{pmatrix}
+		0 \\
+		\vdots \\
+		0 \\
+		1
+		\end{pmatrix} .
+	\end{align*}
+Let $F = [f_n,...,f_1] \in \mathbb{R}^{1\times n}$, then the determinant of $(A+BF)-sI$ is given as
+\begin{align*}
+	\Det((A+BF)-sI) = s^n+(a_1-f_1)s^{n-1}+...+(a_n-f_n).
+\end{align*}
+If $p(s) = s^n+p_1s^{n-1}+...+p_n \in \mathbb{R}[s]$ is given, we may choose $f_k := a_k-p_k$ for $k=1,...,n$.\\Now choose $m>1$, $u_0,...,u_{n-1}$ and $x_1,...,x_n$ as in Lemma \ref{lem:9.3} and let $u_n \in \mathbb{R}^m$ be arbitrary and $b:= Bu_0$. Set $F_0 := [u_1,...,u_n][x_1,...,x_n]^{-1} \in \mathbb{R}^{m\times n}$. Then $F_0[x_1,...,x_n] =[u_1,...,u_n]$ and
+\begin{align*}
+	x_{k+1} = Ax_k + Bu_k = (A+BF_0)x_k
+\end{align*}
+for $k=1,...,n-1$. This implies
+\begin{align*}
+	x_k = (A+BF_0)^{k-1}x_1 = (A+BF_0)^{k-1}b
+\end{align*}
+for $k=1,...,n$. We now see that $[b, (A+BF_0)b, ..., (A+BF_0)^{n-1}b]$ is invertible which implies that $((A+BF_0),b)$ is controllable. This system can be seen as a single input system. We now use the case $m=1$. There exists $f \in \mathbb{R}^{1\times n}$ such that
+\begin{align*}
+    \Det((A+BF_0+bf)-sI) = p(s)
+\end{align*}
+where
+\begin{align*}
+	BF_0+bf = BF_0+Bu_0f = B(F_0+u_0f) =: BF
+\end{align*}
+This finishes the proof.
+\end{proof}
+We see that if the system is controllable we can place the eigenvalues everywhere we like and therefore are able to stabilise our system. Next we will apply this theory to our problem.
+
+
+%-----------------------------------------------------------------
+\subsection{Controller Design}\label{sec:controllerdesign}
+
+Next we will present a controller to achieve that car and the trailer become a stable system. The first step is to linearise the model about $\phi = 0$ and $\delta = 0$ using a Taylor series:
+\begin{align*}
+\Delta \phi = \phi - \phi_{0} .
+\end{align*}
+This linearisation is needed to apply the theory presented in \cref{sec:ppthm}. The desired form of the system is given as in equation (\ref{eq:dynsys}). Here, $D$ is 0 since we do not have a feed-through in our system. For our system we get the following expression
+\begin{align}\label{eq:controler-system}
+\Delta \dot{\phi} = \frac{V}{L_{3}} \Delta \phi - \frac{V}{L_{1}} \qty( 1 + \frac{L_{2}}{L_{3}} ) \Delta \delta .
+\end{align}
+It can easily be seen that $A=\frac{V}{L_3}$, $B = -\frac{V}{L_1}(1+\frac{L_2}{L_3})$, $x = \Delta\phi$ and $u=\Delta\delta$.
+
+The system is given in standard form and therefore it is controllable which means our problem is solvable. This fact can also be proven over the rank-criterion. The Kalman-matrix is $K(A,B) = B$. Since $B$ is a non-zero scalar the Kalman-matrix has full rank and therefore the system is controllable. We will use full-feedback, i.e. the pole placement theorem \ref{thm:PP}, to stabilise the system. In figure \ref{fig:gain-schedule} we can see how this controller looks like and how it can be modelled.
+
+\tikzstyle{block} = [draw, fill=white, rectangle,
+minimum height=3em, minimum width=3em]
+\tikzstyle{sum} = [draw, fill=white, circle]
+
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+\begin{figure}[b]
+	\centering
+	\begin{tikzpicture}[auto,node distance=2cm,>=latex']
+	% We start by placing the blocks
+	\node [input, name=input] {};
+	\node [block,right of=input] (N) {$\bar{N}$};
+	\node [sum, right of=N] (sum) {};
+	\node [block, right of=sum] (B) {$B$};
+	\node [sum, right of=B] (sum2) {};
+	\node [block, right of=sum2] (integrator) {$\dfrac{1}{s}$};
+	\node [block, right of=integrator, xshift=1cm] (C) {$C$};
+	\node [block, below of=integrator] (A) {$A$};
+	\node [block, below of=A] (K) {$K$};
+	\node [output, right of=C] (output) {};
+	
+	\draw [->] (input) -- node {$r$} (N);
+	\draw [->] (N) -- node[pos=0.7] {$+$} (sum);
+	\draw [->] (sum) -- node {$u$} (B);
+	\draw [->] (B) -- node[pos=0.7] {$+$} (sum2);
+	\draw [->] (sum2) -- node {$\dot{x}$} (integrator);
+	\draw [->] (integrator) -- node[name=x]  {$x$} (C);
+	\draw [->] (C) -- node {$y$}(output);
+	\draw [->] (A) -| node[pos=0.9] {$+$}(sum2);
+	\draw [->] (x) |- node[pos=0.9] {}(A);
+	\draw [->] (x) |- node[pos=0.9] {}(K);
+	\draw [->] (K) -| node[pos=0.95] {$-$} (sum);
+	\end{tikzpicture}
+	\caption{Block diagram of the state space model}
+	\label{fig:gain-schedule}
+\end{figure}
+We know how the system behaves when there is no actual controller. We introduce a closed-loop pole to control the system. We assume that we have a full-state feedback system, meaning that all state variables are known to the controller at all times.
+
+For simplicity, let's assume the reference is zero, $r = 0$. The input is then
+\begin{align*}
+u = - K x
+\end{align*}
+The state-space equations for the closed-loop feedback system are, therefore,
+\begin{align}
+    \begin{split}
+        \dot{x} &= A x + B(-K x) = (A-BK) x\\
+        y &= C x
+    \end{split}\label{eq:systemX}
+\end{align}
+
+The stability and time-domain performance of the closed-loop feedback system are determined primarily by the location of the eigenvalues of the matrix ($A-BK$), which are equal to the closed-loop poles. Since the matrices $A$ and $BK$ are both $1\times 1$, there will be one pole for the system. By choosing an appropriate state-feedback gain matrix $K$, we can place these closed-loop poles anywhere we would like because the system is controllable. The pole placement theorem provides the theory that we can compute such a matrix $K$.
+
+In the block diagram \ref{fig:gain-schedule} one may see that we use a factor $\bar{N}$ in the calculation of the time response. This scale factor $\bar{N}$ is used to scale the reference input to make it equal to $K x$ in steady-state, ensuring that $K x$ will be equal to the desired output, i.e. that we do not get a non-zero steady state error. This $\bar{N}$ is computed in general as $\bar{N} = N_u + KN_x$ where $N_x = N(1:n)$ and $N_u = N(1+n)$ using MATLAB notation and $n$ denotes the dimension of $A$. The vector $N$ is
+\begin{align*}
+	N = \begin{bmatrix}
+	A & B \\ 
+	C & D
+	\end{bmatrix} ^{-1}
+	\begin{bmatrix}
+	0 \\ 
+	1
+	\end{bmatrix}
+\end{align*}
+where $[0,...,0,1]$ is a vector of size $n+1$, shortly represented as $[0,1]$.
