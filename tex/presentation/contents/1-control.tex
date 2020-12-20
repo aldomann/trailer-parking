@@ -1,0 +1,325 @@
+%-----------------------------------------------------------------
+%	CONTROL THEORY
+%	!TEX root = ./main.tex
+%-----------------------------------------------------------------
+\section{Introduction to Control Theory}
+
+%-----------------------------------------------------------------
+\subsection{Control Theory}
+\begin{frame}
+
+\begin{onlyenv}<1>
+\only{\frametitle{What is Control Theory?}}<1>
+	\tikzstyle{block} = [draw, fill=white, rectangle,minimum height=3em, minimum width=6em]
+	\tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
+	\tikzstyle{input} = [coordinate]
+	\tikzstyle{output} = [coordinate]
+	\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]	
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[auto, node distance=4cm,>=latex']
+		\node [input, name=input] {};
+		\node [block, right of=input,node distance=4cm] (system) {Dynamical System};
+		\draw [->] (input) -- node[name=u] {$u$} (system);
+		\node [output, right of=system] (output) {};
+		\draw [->] (system) -- node [name=y] {$y$}(output);
+		\end{tikzpicture}
+		\caption{Block diagram of a dynamical system}
+		\label{fig:blockdiagram_dyn_sys}
+	\end{figure}
+	\begin{itemize}
+		\item Input $u(t)$ which represents controls, noises and disturbances
+		\item Output $y(t)$ representing the measurements
+		\item Assumption: approximation by \begin{align}\label{eq:dynsys}
+		\begin{split}
+		\dot{x}(t) &= f(t, x(t), u(t))\\
+		\dot{y}(t) &= h(x(t), u(t))
+		\end{split}
+		\end{align}
+	\end{itemize}
+\end{onlyenv}
+% \end{frame}
+
+% \begin{frame}{What is Control Theory?}
+\begin{onlyenv}<2>
+\only{\frametitle{What is Control Theory?}}<2>
+\begin{itemize}
+	\item Consider system (\ref{eq:dynsys}) is a \emph{linear time-invariant control system} of the form
+	\begin{align}\label{eq:LTI}
+	\begin{aligned}
+		\dot{x}(t) &= Ax(t) + Bu(t)\\
+		\dot{y}(t) &= Cx(t) + Du(t)
+	\end{aligned}
+	\end{align}
+	\item \emph{System matrix} $A$, \emph{input matrix} $B$, \emph{output matrix} $C$ and \emph{feed-through matrix} $D$
+	\item When a nonlinear system is given (3) is obtained by linearisation at points $(x^*,u^*)$ such that $f(x^*,u^*) = 0$
+\end{itemize}
+\end{onlyenv}
+
+\end{frame}
+
+%-----------------------------------------------------------------
+\subsection{Controllability}
+
+\begin{frame}
+
+\begin{onlyenv}<1>
+% \begin{frame}
+\only{\frametitle{What is Controllability?}}<1>
+	Simply said, a system is said to be controllable if it is possible to find a control input that takes the system from any initial state to any final state in any given time interval.
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+% \begin{frame}
+\only{\frametitle{Controllability: Definition - Reachable \& Controllable}}<2>
+	\begin{mydef}
+		A system $(A,B)$ is called
+		\begin{itemize}
+			\item \emph{reachable} at time $T > 0$ if for all $x^1 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = 0$ and $x(T) = x^1$
+			\item \emph{controllable} at time T if for all $x^0,x^1 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = x^0$ and $x(T) = x^1$
+			\item \emph{null-controllable} at time T if for all $x^0 \in \mathbb{R}^n$ there exists $(x,u)\in\mathcal{B}_{(A,B)}$ such that $x(0) = x^0$ and $x(T) = 0$.
+		\end{itemize}
+	\end{mydef}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+\only{\frametitle{Controllability: Definition - Simply said}}<3>
+	\emph{Reachable} means that we can steer the system from 0 to any final state in any time $Z$. \emph{Controllable} mean that it is possible to steer the system from any initial state to any final state in any given time $T$ and hence \emph{null-controllable} means that the final state is 0.
+% \end{frame}
+\end{onlyenv}
+
+%\begin{frame}{Controllability: Definition - Reachable \& Controllable Set}
+%\begin{mydef}
+%	The \emph{reachable set} from $x^0 \in \mathbb{R}^n$ at time $T>0$ is defined as
+%	\begin{align*}
+%	\mathcal{R}_{x^0}(T) := \{x^1 \in \mathbb{R}^n \mid \exists (x,u) \in \mathcal{B}_{(A,B)}: x(0) = x^0, x(T) = x^1   \}.
+%	\end{align*}\\The \emph{controllable set} to $x^1\in\mathbb{R}^n$ at time $T$ is defined as
+%	\begin{align*}
+%	\mathcal{C}_{x^1}(T) := \{x^0 \in \mathbb{R}^n \mid \exists (x,u) \in \mathcal{B}_{(A,B)}: x(0) = x^0, x(T) = x^1   \}.
+%	\end{align*}
+%\end{mydef}
+%\end{frame}
+
+\begin{onlyenv}<4>
+\only{\frametitle{Controllable: Yes or No?}}<4>
+	\begin{mythm}
+		For all $T>0$ it holds
+		\begin{align*}
+		\mathcal{R}_0(T) = \im[B,AB,...,A^{n-1}B]   =: K(A,B) \in \mathbb{R}^{n \times nm}.
+		\end{align*}
+	\end{mythm}
+	\begin{mycor}\label{cor:ctrb}
+		For a system $(A,B)$ the following statements are equivalent:
+		\begin{enumerate}
+			\item There exists $T>0$ such that $(A,B)$ is controllable at time $T$.
+			\item $\im(K(A,B)) = \mathbb{R}^n$
+			\item $\Rank(K(A,B)) = n$
+			\item For all $T>0$ the system $(A,B)$ is controllable at time $T$. We say that $(A,B)$ is controllable.
+		\end{enumerate}
+	\end{mycor}
+\end{onlyenv}
+
+\end{frame}
+
+%-------------------------------
+\subsection{Pole Placement Theorem}
+
+\begin{frame}
+\begin{onlyenv}<1>
+\only{\frametitle{Stability}}<1>
+	\begin{itemize}
+		\item From theory of differential equations stability of a system can be analysed by considering the eigenvalues of the matrix $A$
+		\item One aim of control theory is stabilisation
+	\end{itemize}
+	\begin{alertblock}{Questions}
+		What have eigenvalues and controllability in common?\\
+		How can we stabilise a given system if possible?
+	\end{alertblock}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+\only{\frametitle{Stabilisation}}<2>
+
+\tikzstyle{block} = [draw, fill=white, rectangle,minimum height=2em, minimum width=7em]
+\tikzstyle{sum} = [draw, white, circle]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[auto,node distance=2cm,>=latex']
+		% We start by placing the blocks
+		\node [input, name=input] {};
+		\node [sum, right of=input] (sum) {};
+		\node [block, right of=sum,align=center] (B) {$\dot{x}(t) = Ax(t) + Bu(t)$\\$\dot{y}(t) = Cx(t) + Du(t)$};
+		\node [block, below of=B, align=center]  (K) {$\dot{\omega}(t) = K\omega(t) + Ly(t)$\\$\dot{u}(t) = M\omega(t) + Ny(t)$};
+		\node [sum, right of=B] (sum2) {};
+		\node [output, right of=sum2] (output) {};
+		
+		\draw [->] (input) -- node[name=sum] {u} (B);
+		\draw [->] (B) -- node[pos=0.7, name=y] {y} (output);
+		\draw [->] (y) |- node {}(K);
+		\draw [->] (K) -| node {}(sum);
+		\end{tikzpicture}
+		\caption{Block diagram of a feedback loop}
+		\label{fig:blockdiagram_feedback_loop}
+	\end{figure}
+	Aim: determine a feedback controller such that
+	\begin{align*}
+	\begin{pmatrix}
+	\dot{x}(t) \\
+	\omega(t)
+	\end{pmatrix} =
+	\begin{pmatrix}
+	A+BNC & BM \\
+	LC & K
+	\end{pmatrix}
+	\begin{pmatrix}
+	x(t) \\
+	\omega(t)
+	\end{pmatrix}
+	\end{align*}
+	is internally stable, i.e. all eigenvalues of A have negative real part.
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+\only{\frametitle{Pole Placement Theorem}}<3>
+	\begin{mythm}\label{thm:PP}
+		Let $(A,B)$ be a system as in (3). The the system is controllable if and only if for all monic, i.e. the leading coefficient is 1, polynomial $p(s) \in\mathbb{R}[s]$ with $\Deg(p(s)) = n$ there exists $F\in\mathbb{R}^{m\times n}$ such that $p(s) = \Det((A+BF)-sI)$.
+	\end{mythm}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<4>
+\only{\frametitle{Pole Placement Theorem - What does it say?}}<4>
+	We see that if the system is controllable we can place the eigenvalues everywhere we like and therefore are able to stabilise our system.
+\end{onlyenv}
+
+\end{frame}
+
+%-------------------------------
+\subsection{Controller Design}
+
+\begin{frame}
+
+\begin{onlyenv}<1>
+\only{\frametitle{Achieve Stability}}<1>
+	\begin{itemize}
+		\item Linearise the model about $\phi = 0$ and $\delta = 0$ using a Taylor series:
+		\item We get
+		\begin{align}\label{eq:controler-system}
+		\Delta \dot{\phi} = \frac{V}{L_{3}} \Delta \phi - \frac{V}{L_{1}} \qty( 1 + \frac{L_{2}}{L_{3}} ) \Delta \delta 
+		\end{align}
+		with
+		\begin{align*}
+		\Delta \phi = \phi - \phi_{0} 
+		\end{align*}
+		\item $A=\frac{V}{L_3}$, $B = -\frac{V}{L_1}(1+\frac{L_2}{L_3})$, $x = \Delta\phi$ and $u=\Delta\delta$
+		\item For $C$ we can choose 1 and therefore $y=x$ since $D=0$
+	\end{itemize}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+\only{\frametitle{Is it controllable?}}<2>
+	\begin{itemize}
+		\item Kalman-matrix is $K(A,B) = B$
+		\item Since $B = -\frac{V}{L_1}(1+\frac{L_2}{L_3}) > 0$ is a positive scalar the Kalman-matrix has full rank and therefore the system is controllable
+		\item We can use the pole placement theorem to stabilise the system
+	\end{itemize}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+\only{\frametitle{Full-State Feedback Controller}}<3>
+
+\tikzstyle{block} = [draw, fill=white, rectangle, minimum height=3em, minimum width=3em]
+\tikzstyle{sum} = [draw, fill=white, circle]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+\begin{figure}[h]
+	\centering
+	\resizebox{\textwidth}{!}{
+	\begin{tikzpicture}[auto,node distance=1.5cm,>=latex']
+	% We start by placing the blocks
+	\node [input, name=input] {};
+	\node [block,right of=input] (N) {$\bar{N}$};
+	\node [sum, right of=N] (sum) {};
+	\node [block, right of=sum] (B) {$B$};
+	\node [sum, right of=B] (sum2) {};
+	\node [block, right of=sum2] (integrator) {$\dfrac{1}{s}$};
+	\node [block, right of=integrator, xshift=1cm] (C) {$C$};
+	\node [block, below of=integrator] (A) {$A$};
+	\node [block, below of=A] (K) {$K$};
+	\node [output, right of=C] (output) {};
+	
+	\draw [->] (input) -- node {$r$} (N);
+	\draw [->] (N) -- node[pos=0.7] {$+$} (sum);
+	\draw [->] (sum) -- node {$u$} (B);
+	\draw [->] (B) -- node[pos=0.7] {$+$} (sum2);
+	\draw [->] (sum2) -- node {$\dot{x}$} (integrator);
+	\draw [->] (integrator) -- node[name=x]  {$x$} (C);
+	\draw [->] (C) -- node {$y$}(output);
+	\draw [->] (A) -| node[pos=0.9] {$+$}(sum2);
+	\draw [->] (x) |- node[pos=0.9] {}(A);
+	\draw [->] (x) |- node[pos=0.9] {}(K);
+	\draw [->] (K) -| node[pos=0.95] {$-$} (sum);
+	\end{tikzpicture}}
+	\caption{Block diagram of the state space model}
+	\label{fig:gain-schedule}
+\end{figure}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<4>
+\only{\frametitle{Full-State Feedback Controller}}<4>
+	For simplicity, let's assume the reference is zero, $r = 0$. The input is then
+	\begin{align*}
+	u = - K x
+	\end{align*}
+	The state-space equations for the closed-loop feedback system are, therefore,
+	\begin{align}
+	\begin{split}
+	\dot{x} &= (A-BK) x\\
+	y &= C x
+	\end{split}\label{eq:systemX}
+	\end{align}
+% \end{frame}
+\end{onlyenv}
+
+%The stability and time-domain performance of the closed-loop feedback system are determined primarily by the location of the eigenvalues of the matrix ($A-BK$), which are equal to the closed-loop poles. Since the matrices $A$ and $BK$ are both $1\times 1$, there will be one pole for the system. By choosing an appropriate state-feedback gain matrix $K$, we can place these closed-loop poles anywhere we would like because the system is controllable. The pole placement theorem provides the theory that we can compute such a matrix $K$.
+
+\begin{onlyenv}<5>
+\only{\frametitle{Feedback matrix $K$}}<5>
+	\begin{itemize}
+		\item Stability and time-domain performance of the closed-loop feedback system are determined primarily by the location of the eigenvalues of the matrix ($A-BK$)
+		\item We only have 1 eigenvale to place since our system is one dimensional
+		\item[$\Rightarrow$] compute such a matrix $K$
+	\end{itemize}
+% \end{frame}
+\end{onlyenv}
+
+\begin{onlyenv}<6>
+\only{\frametitle{Eliminate Steady State Error}}<6>
+\begin{itemize}
+	\item $\bar{N}$ is used to scale the reference input to make it equal to $K x$ in steady-state
+	$\Rightarrow$ $K x$ will be equal to the desired output, i.e. that we do not get a non-zero steady state error
+	\item $\bar{N}$ is computed in general as $\bar{N} = N_u + KN_x$ where $N_x = N(1:n)$ and $N_u = N(1+n)$ using MATLAB notation and
+	\begin{align*}
+	N = \begin{bmatrix}
+	A & B \\ 
+	C & D
+	\end{bmatrix} ^{-1}
+	\begin{bmatrix}
+	0 \\ 
+	1
+	\end{bmatrix}
+	\end{align*}
+	where $[0,...,0,1]$ is a vector of size $n+1$, shortly represented as $[0,1]$, and $n$ the dimension of the system
+\end{itemize}
+\end{onlyenv}
+
+\end{frame}

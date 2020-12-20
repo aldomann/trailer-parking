@@ -104,7 +104,7 @@
   \leavevmode%
   \@tempdimb=2.4375ex%
     \multiply\@tempdimb by\beamer@sectionmax%
-  \pgfdeclareimage[height=\@tempdimb]{logo}{assets/crm_logo3}%
+  \pgfdeclareimage[height=0.75\@tempdimb]{logo}{assets/crm_logo3}%
   \logo{\pgfuseimage{logo}}%
   \ifdim\@tempdimb>0pt%
     \advance\@tempdimb by 1.125ex%
@@ -112,7 +112,8 @@
       \vbox to\@tempdimb{\vfil\insertsectionnavigation{0.5\paperwidth}\vfil}%
     \end{beamercolorbox}%
     \begin{beamercolorbox}[wd=.4\paperwidth,ht=\@tempdimb,right]{subsection in head/foot}%
-      \vbox to\@tempdimb{\vfil\vfil\textbf{\footnotesize\insertshortinstitute~~}\vfil}%
+    %   \vbox to\@tempdimb{\vfil\vfil\textbf{\footnotesize\insertshortinstitute~~}\vfil}%
+      \vbox to\@tempdimb{\vfil\insertsubsectionnavigation{.5\paperwidth}\vfil}%
     \end{beamercolorbox}%
     \begin{beamercolorbox}[wd=.1\paperwidth,ht=\@tempdimb,left]{subsection in head/foot}%
       \vbox to\@tempdimb{\vfil\insertlogo\vfil\vfil}%

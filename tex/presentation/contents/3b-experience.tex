@@ -1,0 +1,149 @@
+%-----------------------------------------------------------------
+%	EXPERIENCE CONTROL
+%	!TEX root = ./main.tex
+%-----------------------------------------------------------------
+%-----------------------------------------------------------------
+
+\subsection{Steering-based Control}
+\begin{frame}{The grounds of the approach}
+\begin{minipage}{0.5\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{images/trailer-diagram-marti}
+        % \caption{Geometric model of the car-trailer system}
+        \label{fig:geom-model-marti}
+    \end{figure}
+\end{minipage}%
+\hfill%
+\begin{minipage}{0.5\textwidth}
+\begin{itemize}
+    \item Python 2.7 implementation
+    \item Matplotlib
+    \item NumPy
+\end{itemize}
+\end{minipage}
+
+\begin{itemize}
+    \item \footnotesize{$\dot{\phi} = \dfrac{V}{L_3} \cdot \sin{\phi} + \dfrac{V \cdot \tan{\delta}}{L_1} \cdot \left(1 + \dfrac{L_2 \cdot \cos{\phi}}{L_3}\right)$}
+    \item \footnotesize{$\phi_i = \phi_{i-1} + \left( \dfrac{\sin{\phi_{i-1}}}{L_3} + \dfrac{\tan{\delta}}{L_1} \cdot \left( 1 + \dfrac{L_2 \cdot \cos{\phi_{i-1}}}{L_3}\right)\right) \cdot V \cdot \Delta t$}
+\end{itemize}
+
+2 main goals:
+\begin{itemize}
+    \item Visualise and check the behaviour of the model
+    \item Create a steering-based controller
+\end{itemize}
+\end{frame}
+
+\begin{frame}{First Tests of the Model}
+
+\begin{onlyenv}<1>
+\begin{minipage}{.5\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/car-trailer}
+        \caption{Diagram of the system}
+        \label{fig:car-trailer-diag}
+    \end{figure}
+    \begin{itemize}
+        \item Go from $A$ to $B$ backwards.
+    \end{itemize}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{images/points}
+        % \caption{Diagram of the system}
+        \label{fig:points}
+    \end{figure}
+\end{minipage}
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+\begin{minipage}{.5\textwidth}
+    \movie[width=6cm,height=4.5cm,poster]{%
+        \hspace{0.8cm}%
+        \includegraphics[width=0.8\textwidth]{images/thumbtest2}}%
+        {videos/test2.mp4}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+    \movie[width=6cm,height=4.5cm,poster]{%
+        \includegraphics[width=0.8\textwidth]{images/thumbtest1}}%
+        {videos/test.mp4}
+\end{minipage}
+\end{onlyenv}
+
+\end{frame}
+
+\begin{frame}{Steering-based Control}
+
+\begin{onlyenv}<1-4>
+\begin{minipage}{.45\textwidth}
+    \begin{enumerate}[(i)]
+        \footnotesize
+        \item<2,4> Face trailer to a “non-annoying” direction.
+        \item<3,4> Move the car to the goal point.
+    \end{enumerate}
+    \begin{itemize}
+        \item<4> Keep repeating (i) until reaching point $B$.
+    \end{itemize}
+\end{minipage}%
+\begin{minipage}{.55\textwidth}
+    \begin{onlyenv}<1>
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{images/snapshot1}
+        % \caption{Diagram of the system}
+        \label{fig:points}
+    \end{figure}
+    \end{onlyenv}
+    \begin{onlyenv}<2>
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{images/snapshot2}
+        % \caption{Diagram of the system}
+        \label{fig:points}
+    \end{figure}
+    \end{onlyenv}
+    \begin{onlyenv}<3>
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{images/snapshot3}
+        % \caption{Diagram of the system}
+        \label{fig:points}
+    \end{figure}
+    \end{onlyenv}
+    \begin{onlyenv}<4>
+    \movie[width=7cm,height=5.25cm,poster]{%
+        \hspace{0.8cm}%
+        \includegraphics[width=0.8\textwidth]{images/thumb1}}%
+        {videos/movie1.mp4}
+    % \begin{figure}[H]
+    %     \centering
+    %     \movie[width=7cm,height=5.25cm,poster]{%
+    %     \includegraphics[width=\textwidth]{images/snapshot3}}%
+    %     {videos/movie1.mp4}
+    %     \label{fig:points}
+    % \end{figure}
+    \end{onlyenv}
+\end{minipage}
+\end{onlyenv}
+
+\begin{onlyenv}<5>
+\begin{minipage}{.5\textwidth}
+    \movie[width=6cm,height=4.5cm,poster]{%
+        \includegraphics[width=0.8\textwidth]{images/thumb2}}%
+        {videos/movie2.mp4}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+    \movie[width=6cm,height=4.5cm,poster]{%
+        \hspace{0.8cm}%
+        \includegraphics[width=0.8\textwidth]{images/thumb3}}%
+        {videos/movie3.mp4}
+\end{minipage}
+
+\footnotesize{Available at \url{https://github.com/martimunicoy/TrailerController}}
+
+\end{onlyenv}
+
+\end{frame}

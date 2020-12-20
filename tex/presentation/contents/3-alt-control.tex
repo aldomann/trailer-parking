@@ -1,0 +1,150 @@
+%-----------------------------------------------------------------
+%	STEERING CONTROL
+%	!TEX root = ./main.tex
+%-----------------------------------------------------------------
+\section{Alternative Control Methods}
+
+\input{contents/3a-optimisation}
+\input{contents/3b-experience}
+
+
+%-----------------------------------------------------------------
+% \subsection{Optimisation-based}
+
+% \begin{frame}{Optimisation-based}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.55\textwidth]{images/pic_trailer.png}
+%     \caption{Geometric situation}
+%     \label{fig:trailer}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.55\textwidth]{images/divisions.png}
+%     \caption{Time divisions of the method}
+%     \label{fig:trailer2}
+% \end{figure}
+% \end{frame}
+
+% \begin{frame}{Frame Title}
+% We optimise, as a function of $\delta$:
+% $$
+% cost_{\alpha}(y, \phi) = y^2+\alpha \phi^2 
+% $$
+
+% \end{frame}
+
+
+%-----------------------------------------------------------------
+
+% \subsection{Experience Control}
+% \begin{frame}{First Tests of the Model}
+
+% \begin{onlyenv}<1>
+% \begin{minipage}{.5\textwidth}
+%     \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=0.6\textwidth]{images/car-trailer}
+%         \caption{Diagram of the system}
+%         \label{fig:car-trailer-diag}
+%     \end{figure}
+%     \begin{itemize}
+%         \item Go from $A$ to $B$ backwards.
+%     \end{itemize}
+% \end{minipage}%
+% \begin{minipage}{0.5\textwidth}
+%     \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=\textwidth]{images/points}
+%         % \caption{Diagram of the system}
+%         \label{fig:points}
+%     \end{figure}
+% \end{minipage}
+% \end{onlyenv}
+
+% \begin{onlyenv}<2>
+% \begin{minipage}{.5\textwidth}
+%     \movie[width=6cm,height=4.5cm,poster]{%
+%         \includegraphics[width=0.8\textwidth]{images/thumbtest1}}%
+%         {videos/test.mp4}
+% \end{minipage}%
+% \begin{minipage}{.5\textwidth}
+%     \movie[width=6cm,height=4.5cm,poster]{%
+%         \hspace{0.8cm}%
+%         \includegraphics[width=0.8\textwidth]{images/thumbtest2}}%
+%         {videos/test2.mp4}
+% \end{minipage}
+% \end{onlyenv}
+
+% \end{frame}
+
+% \begin{frame}{Steering-based Control}
+
+% \begin{onlyenv}<1-4>
+% \begin{minipage}{.45\textwidth}
+%     \begin{enumerate}[(i)]
+%         \footnotesize
+%         \item<2,4> Face trailer to a “non-annoying” direction.
+%         \item<3,4> Move the car to the goal point.
+%     \end{enumerate}
+%     \begin{itemize}
+%         \item<4> Keep repeating (i) until reaching point $B$.
+%     \end{itemize}
+% \end{minipage}%
+% \begin{minipage}{.55\textwidth}
+%     \begin{onlyenv}<1>
+%     \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=\textwidth]{images/snapshot1}
+%         % \caption{Diagram of the system}
+%         \label{fig:points}
+%     \end{figure}
+%     \end{onlyenv}
+%     \begin{onlyenv}<2>
+%     \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=\textwidth]{images/snapshot2}
+%         % \caption{Diagram of the system}
+%         \label{fig:points}
+%     \end{figure}
+%     \end{onlyenv}
+%     \begin{onlyenv}<3>
+%     \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=\textwidth]{images/snapshot3}
+%         % \caption{Diagram of the system}
+%         \label{fig:points}
+%     \end{figure}
+%     \end{onlyenv}
+%     \begin{onlyenv}<4>
+%     \movie[width=7cm,height=5.25cm,poster]{%
+%         \hspace{0.8cm}%
+%         \includegraphics[width=0.8\textwidth]{images/thumb1}}%
+%         {videos/movie1.mp4}
+%     % \begin{figure}[H]
+%     %     \centering
+%     %     \movie[width=7cm,height=5.25cm,poster]{%
+%     %     \includegraphics[width=\textwidth]{images/snapshot3}}%
+%     %     {videos/movie1.mp4}
+%     %     \label{fig:points}
+%     % \end{figure}
+%     \end{onlyenv}
+% \end{minipage}
+% \end{onlyenv}
+
+% \begin{onlyenv}<5>
+% \begin{minipage}{.5\textwidth}
+%     \movie[width=6cm,height=4.5cm,poster]{%
+%         \includegraphics[width=0.8\textwidth]{images/thumb2}}%
+%         {videos/movie2.mp4}
+% \end{minipage}%
+% \begin{minipage}{.5\textwidth}
+%     \movie[width=6cm,height=4.5cm,poster]{%
+%         \hspace{0.8cm}%
+%         \includegraphics[width=0.8\textwidth]{images/thumb3}}%
+%         {videos/movie3.mp4}
+% \end{minipage}
+% \end{onlyenv}
+
+% \end{frame}
